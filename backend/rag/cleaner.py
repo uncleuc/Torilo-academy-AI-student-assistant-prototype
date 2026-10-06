@@ -17,7 +17,7 @@ def clean_text(text):
 
     # Remove trailing whitespace from each line
     text = "\n".join(
-        line.rstrip()
+        line.rstrip() 
         for line in text.splitlines("\n")
         )
 

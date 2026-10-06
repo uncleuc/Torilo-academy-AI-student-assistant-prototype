@@ -1,6 +1,6 @@
-# This file will become the orchestrator for the ingestion process.
-# It won't contain the individual logic for loading,
-# cleaning, chunking, metadata, or embeddings.
+# This file will become the orchestrator for the ingestion process. 
+# It won't contain the individual logic for loading, 
+# cleaning, chunking, metadata, or embeddings. 
 # Instead, it will call the components you've already built.
 
 
