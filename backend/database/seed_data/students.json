@@ -1,1 +1,8 @@
-[]
+[
+	{
+		"id": 1,
+		"full_name": "Sample Student One",
+		"email": "student-one@example.invalid",
+		"is_active": true
+	}
+]

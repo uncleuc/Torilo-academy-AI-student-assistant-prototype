@@ -1,1 +1,20 @@
-[]
+[
+	{
+		"id": 1,
+		"name": "Synthetic Python Course",
+		"description": "Synthetic development record for database-tool testing.",
+		"level": "beginner",
+		"duration_weeks": 8,
+		"is_active": true,
+		"instructor_id": 1
+	},
+	{
+		"id": 2,
+		"name": "Synthetic Data Course",
+		"description": "Synthetic development record for database-tool testing.",
+		"level": "intermediate",
+		"duration_weeks": 10,
+		"is_active": true,
+		"instructor_id": 2
+	}
+]
