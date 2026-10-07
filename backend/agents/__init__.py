@@ -1,1 +1,1 @@
-"""LangGraph agent orchestration package."""
+"""LangGraph orchestration for the Torilo AI Student Assistant."""

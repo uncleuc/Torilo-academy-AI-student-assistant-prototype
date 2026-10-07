@@ -1,1 +1,1 @@
-"""AI model and response support package."""
+"""LLM configuration, prompts, grounding, and response formatting."""

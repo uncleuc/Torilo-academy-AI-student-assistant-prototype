@@ -6,4 +6,4 @@ requires-python = ">=3.11"
 dependencies = []
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "backend/agents/test", "backend/ai/test"]
