@@ -1,6 +1,5 @@
-from pydantic import BaseModel
 
-from typing import Optional
+from pydantic import BaseModel
 
 
 class DocumentMetadata(BaseModel):
@@ -8,8 +7,11 @@ class DocumentMetadata(BaseModel):
     document_type: str
     source_type: str
     organization: str
-    original_source: Optional[str] = None
-    last_verified: Optional[str] = None
+    approved: bool
+    title: str | None = None
+    category: str | None = None
+    original_source: str | None = None
+    last_verified: str | None = None
     status: str = "Active"
 
 

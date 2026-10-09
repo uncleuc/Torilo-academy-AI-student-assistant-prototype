@@ -1,5 +1,5 @@
-from rag.query_intent import detect_intent
-from rag.hybrid_retriever import HybridRetriever
+from backend.rag.hybrid_retriever import HybridRetriever
+from backend.rag.query_intent import detect_intent
 
 
 class RAGRetriever:

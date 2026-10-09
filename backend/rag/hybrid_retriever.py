@@ -1,5 +1,5 @@
-from rag.retriever import Retriever
-from rag.metadata_filter import MetadataFilter
+from backend.rag.metadata_filter import MetadataFilter
+from backend.rag.retriever import Retriever
 
 
 class HybridRetriever:
@@ -54,11 +54,7 @@ class HybridRetriever:
                 self.metadata_filter
                 .vector_store
                 .collection
-                .get(
-                    where={
-                        "document_type": document_type
-                    }
-                )
+                .get(where={"$and": [{"approved": True}, {"document_type": document_type}]})
             )
 
             for document, metadata in zip(
@@ -94,6 +90,9 @@ class HybridRetriever:
                         "source_type": metadata.get(
                             "source_type"
                         ),
+                        "title": metadata.get("title"),
+                        "category": metadata.get("category"),
+                        "approved": metadata.get("approved"),
                         "chunk_index": metadata.get(
                             "chunk_index"
                         ),

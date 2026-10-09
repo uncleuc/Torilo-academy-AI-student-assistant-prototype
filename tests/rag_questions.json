@@ -1,1 +1,13 @@
-[]
+[
+	{"id":"attendance-missed-class","question":"What happens if I miss class?","expected_route":"RAG","expected_source":"policies/attendance_and_participation.md"},
+	{"id":"attendance-missed-classes","question":"What happens if I miss classes?","expected_route":"RAG","expected_source":"policies/attendance_and_participation.md"},
+	{"id":"attendance-valid-reason","question":"What if I have a valid reason for missing class?","expected_route":"RAG","expected_source":"policies/attendance_and_participation.md"},
+	{"id":"ai-engineering-overview","question":"What is the AI Engineering course overview?","expected_route":"RAG","expected_source":"courses/ai_engineering.md"},
+	{"id":"ai-engineering-academy-overview","question":"What is Torilo Academy's AI Engineering course overview?","expected_route":"RAG","expected_source":"courses/ai_engineering.md"},
+	{"id":"admissions-how-to-apply","question":"How can I gain admission to Torilo Academy?","expected_route":"RAG","expected_source":"admissions/admissions_and_registration.md"},
+	{"id":"refund-policy","question":"What is the refund policy?","expected_route":"RAG","expected_source":"policies/refund_policy.md"},
+	{"id":"fees-payment","question":"How does the fees and payment policy work?","expected_route":"RAG","expected_source":"policies/fees_and_payment.md"},
+	{"id":"certification","question":"What are the certification requirements?","expected_route":"RAG","expected_source":"policies/certification_policy.md"},
+	{"id":"student-support","question":"How can I contact student support?","expected_route":"RAG","expected_source":"academy/student_support.md"},
+	{"id":"enrollment-requirements","question":"What are the enrollment requirements?","expected_route":"RAG","expected_source":"admissions/enrollment_requirements.md"}
+]

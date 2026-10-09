@@ -20,8 +20,10 @@ _DATABASE_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
 	(re.compile(r"\b(search courses|find courses|search for courses)\b", re.IGNORECASE), "search_courses"),
 )
 _RAG_TERMS = re.compile(
-	r"\b(attendance|absence|miss a class|missed a class|assessment|exam|refund|payment|"
-	r"conduct|handbook|student procedure|support procedure|faq|policy|policies)\b",
+	r"\b(attendance|absence|miss(?:ed|ing)?\s+(?:a\s+)?class(?:es)?|assessment|exam|refund|payment|"
+	r"certification|certificate|conduct|handbook|student support|support team|student procedure|support procedure|faq|policy|policies|"
+	r"admission|admissions|enrollment|enrolment|course overview|course curriculum|"
+	r"course content|course information|course details)\b",
 	re.IGNORECASE,
 )
 _ACADEMY_MARKERS = re.compile(

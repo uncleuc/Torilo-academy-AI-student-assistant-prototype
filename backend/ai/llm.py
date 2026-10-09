@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import os
 from typing import Any
 
 from langchain_openai import ChatOpenAI
+
+from backend.config import get_settings
 
 
 class LLMConfigurationError(RuntimeError):
@@ -24,8 +25,9 @@ def create_chat_model(
 	Tests should inject a fake model into the graph and should not call this
 	function. A real provider connection is created only when the model is used.
 	 """
-	api_key = os.getenv("OPENAI_API_KEY")
-	selected_model = model_name or os.getenv("LLM_MODEL")
+	settings = get_settings()
+	api_key = settings.openai_api_key
+	selected_model = model_name or settings.llm_model
 	if not api_key:
 		raise LLMConfigurationError("OPENAI_API_KEY is required to initialize the LLM")
 	if not selected_model:

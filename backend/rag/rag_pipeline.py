@@ -1,6 +1,6 @@
-from rag.rag_retriever import RAGRetriever
-from rag.context_builder import build_context
-from rag.source_builder import build_sources
+from backend.rag.context_builder import build_context
+from backend.rag.rag_retriever import RAGRetriever
+from backend.rag.source_builder import build_sources
 
 
 class RAGPipeline:
@@ -64,3 +64,36 @@ class RAGPipeline:
             "context": context,
             "sources": sources,
         }
+
+    def retrieve_documents(self, query):
+        """Return the canonical Group 2 evidence and citation contract."""
+        response = self.search(query=query)
+        context = []
+        sources = []
+        seen_sources = set()
+
+        for result in response["results"]:
+            if result.get("approved") is not True:
+                continue
+            metadata = {
+                "document": result.get("source"),
+                "title": result.get("title") or result.get("document_type"),
+                "section": result.get("section"),
+                "page": result.get("page"),
+                "source_type": result.get("source_type"),
+                "category": result.get("category"),
+                "approved": True,
+            }
+            context.append(
+                {
+                    "content": result.get("content", ""),
+                    "metadata": metadata,
+                    "score": result.get("retrieval_score", result.get("similarity")),
+                }
+            )
+            source_key = (metadata["document"], metadata["title"])
+            if source_key not in seen_sources:
+                sources.append(metadata)
+                seen_sources.add(source_key)
+
+        return {"context": context, "sources": sources}

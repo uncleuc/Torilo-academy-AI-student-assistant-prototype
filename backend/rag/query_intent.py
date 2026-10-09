@@ -1,5 +1,3 @@
-from typing import Optional
-
 
 INTENT_RULES = {
     "course_catalogue": {
@@ -68,6 +66,8 @@ INTENT_RULES = {
             "attendance",
             "miss class",
             "miss classes",
+            "missing class",
+            "missing classes",
             "absent",
             "absence",
             "late to class",
@@ -91,6 +91,7 @@ INTENT_RULES = {
         "document_type": "Student Support",
         "keywords": [
             "student support",
+            "student support team",
             "contact support",
             "contact student support",
             "support team",
@@ -153,8 +154,15 @@ INTENT_RULES = {
 }
 
 
-def detect_intent(query: str) -> Optional[dict]:
+def detect_intent(query: str) -> dict | None:
     query_lower = query.lower().strip()
+
+    course_specific_overview = (
+        any(term in query_lower for term in ("course", "programme", "program"))
+        and any(term in query_lower for term in ("overview", "curriculum", "course content"))
+    )
+    if course_specific_overview:
+        return None
 
     for intent, config in INTENT_RULES.items():
         for keyword in config["keywords"]:

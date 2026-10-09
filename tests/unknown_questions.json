@@ -1,1 +1,8 @@
-[]
+[
+	{"id":"student-accommodation","question":"Does Torilo Academy provide student accommodation in Abuja?","expected_route":"UNKNOWN","expected_llm_calls":0,"expected_sources":[]},
+	{"id":"academy-acceptance-rate","question":"What is Torilo Academy's acceptance rate?","expected_route":"UNKNOWN","expected_llm_calls":0,"expected_sources":[]},
+	{"id":"current-academy-ceo","question":"Who is the current CEO of Torilo Academy?","expected_route":"UNKNOWN","expected_llm_calls":0,"expected_sources":[]},
+	{"id":"scholarships","question":"Does Torilo Academy offer scholarships?","expected_route":"UNKNOWN","expected_llm_calls":0,"expected_sources":[]},
+	{"id":"student-loans","question":"Can students get loans from Torilo Academy?","expected_route":"UNKNOWN","expected_llm_calls":0,"expected_sources":[]},
+	{"id":"instructor-salaries","question":"How much do Torilo Academy instructors earn?","expected_route":"UNKNOWN","expected_llm_calls":0,"expected_sources":[]}
+]

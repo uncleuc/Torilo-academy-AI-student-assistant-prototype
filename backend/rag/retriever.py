@@ -1,5 +1,5 @@
-from rag.embeddings import EmbeddingModel
-from rag.vector_store import VectorStore
+from backend.rag.embeddings import EmbeddingModel
+from backend.rag.vector_store import VectorStore
 
 
 class Retriever:
@@ -31,13 +31,15 @@ class Retriever:
         relevant to the user's query.
         """
 
-        query_embedding = self.embedding_model.encode(
-            [query]
-        )[0]
+        if hasattr(self.embedding_model, "encode_query"):
+            query_embedding = self.embedding_model.encode_query(query)
+        else:
+            query_embedding = self.embedding_model.encode([query])[0]
 
         results = self.vector_store.collection.query(
-            query_embeddings=[query_embedding.tolist()],
-            n_results=top_k
+            query_embeddings=[list(query_embedding)],
+            n_results=top_k,
+            where={"approved": True},
         )
 
         retrieved_chunks = []
@@ -67,6 +69,9 @@ class Retriever:
                 "document_id": metadata.get("document_id"),
                 "document_type": metadata.get("document_type"),
                 "source_type": metadata.get("source_type"),
+                "title": metadata.get("title"),
+                "category": metadata.get("category"),
+                "approved": metadata.get("approved"),
                 "chunk_index": metadata.get("chunk_index"),
                 "similarity": similarity,
                 "retrieval_score": similarity,

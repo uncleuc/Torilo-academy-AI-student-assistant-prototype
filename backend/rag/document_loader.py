@@ -1,25 +1,44 @@
-from pathlib import Path #pathlib gives us a clean way to work with folders and files across operating systems.
+import json
+from pathlib import Path
 
 
-def load_documents(knowledge_base_path):
-    """
-    Load documents from a specified directory.
+def load_documents(knowledge_base_path, index_path=None):
+    """Load Markdown documents explicitly approved in the knowledge-base index."""
+    knowledge_base = Path(knowledge_base_path).resolve()
+    registry_path = Path(index_path) if index_path else knowledge_base / "index.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    if not isinstance(registry, list):
+        raise TypeError("Knowledge-base index must contain a JSON array")
 
-    Args:
-        knowledge_base_path (str): The path to the directory containing documents.
-    """
+    documents = []
+    for entry in registry:
+        if not isinstance(entry, dict):
+            raise TypeError("Knowledge-base index entries must be objects")
+        if "approved" not in entry or not isinstance(entry["approved"], bool):
+            raise ValueError("Every knowledge-base entry must have a boolean 'approved' field")
+        if entry["approved"] is not True:
+            continue
+        for field in ("title", "category", "source_type"):
+            if not isinstance(entry.get(field), str) or not entry[field].strip():
+                raise ValueError(f"Approved knowledge-base entries must include '{field}'")
+        document = entry.get("document")
+        if not isinstance(document, str) or not document.strip():
+            raise ValueError("Approved knowledge-base entries must include a document path")
 
-    documents = [] # Initialize an empty list to store the loaded documents.
+        file_path = (knowledge_base / document).resolve()
+        if knowledge_base not in file_path.parents:
+            raise ValueError(f"Registry path escapes knowledge base: {document}")
+        if file_path.suffix.lower() != ".md":
+            raise ValueError(f"Unsupported knowledge-base document type: {file_path.suffix}")
+        if not file_path.is_file():
+            raise FileNotFoundError(f"Approved knowledge-base document does not exist: {document}")
 
-    knowledge_base = Path(knowledge_base_path)
-
-    for file_path in knowledge_base.rglob("*.md"): # rglob is a method that recursively searches for files matching the given pattern (in this case, all markdown files) in the specified directory and its subdirectories.
-        with open(file_path, "r", encoding="utf-8") as file: # Open the file in read mode with UTF-8 encoding to handle various characters correctly.
-            content = file.read()
-            
-        documents.append({
-            "content": content,
-            "source": str(file_path.relative_to(knowledge_base))
-        })
+        documents.append(
+            {
+                "content": file_path.read_text(encoding="utf-8"),
+                "source": file_path.relative_to(knowledge_base).as_posix(),
+                "registry": entry,
+            }
+        )
 
     return documents

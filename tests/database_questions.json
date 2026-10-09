@@ -1,1 +1,8 @@
-[]
+[
+	{"id":"available-courses","question":"What courses are available?","expected_route":"DATABASE","expected_tool":"get_available_courses"},
+	{"id":"academy-course-catalogue","question":"What courses does Torilo Academy offer?","expected_route":"DATABASE","expected_tool":"get_available_courses"},
+	{"id":"active-classes","question":"Which classes are currently active?","expected_route":"DATABASE","expected_tool":"get_active_classes"},
+	{"id":"python-instructor","question":"Who teaches the Synthetic Python Course?","expected_route":"DATABASE","expected_tool":"get_course_instructor","expected_search_query":"Synthetic Python"},
+	{"id":"python-course-details","question":"Tell me about the course Synthetic Python","expected_route":"DATABASE","expected_tool":"get_course_details","expected_search_query":"Synthetic Python"},
+	{"id":"search-data-courses","question":"Find courses for Data","expected_route":"DATABASE","expected_tool":"search_courses","expected_search_query":"Data"}
+]

@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
-import os
 from collections.abc import Callable, Mapping
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session, sessionmaker
 
 from backend.api.errors import register_error_handlers
 from backend.api.health import router as health_router
 from backend.api.routes import router as api_router
+from backend.config import configure_logging, get_settings
 from backend.database.database import create_database_engine, create_session_factory
 from backend.tools import build_database_tools
 
@@ -35,7 +35,10 @@ def initialize_group_services(
 	from backend.rag.ingestion import ingest_documents
 
 	repository_root = Path(__file__).resolve().parents[2]
-	retriever = ingest_documents(repository_root / "knowledge_base")
+	retriever = ingest_documents(
+		repository_root / "knowledge_base",
+		settings=get_settings(),
+	)
 	configure_assistant(
 		retriever=retriever,
 		database_tools=database_tools,
@@ -58,8 +61,8 @@ def create_app(
 	allowed_origins: list[str] | None = None,
 ) -> FastAPI:
 	"""Create an API with lazy production setup and injectable test services."""
-	repository_root = Path(__file__).resolve().parents[2]
-	load_dotenv(repository_root / ".env", override=False)
+	settings = get_settings()
+	configure_logging(settings.log_level)
 	provided_session_factory = session_factory
 	provided_tools = database_tools
 	provided_runner = assistant_runner
@@ -98,11 +101,7 @@ def create_app(
 	)
 	origins = allowed_origins
 	if origins is None:
-		origins = [
-			origin.strip()
-			for origin in os.getenv("FRONTEND_URL", "").split(",")
-			if origin.strip()
-		]
+		origins = list(settings.frontend_origins)
 	if origins:
 		app.add_middleware(
 			CORSMiddleware,
@@ -114,6 +113,13 @@ def create_app(
 	app.include_router(health_router)
 	app.include_router(api_router)
 	register_error_handlers(app)
+	frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+	if frontend_dist.is_dir():
+		app.mount(
+			"/",
+			StaticFiles(directory=frontend_dist, html=True),
+			name="frontend",
+		)
 	return app
 
 

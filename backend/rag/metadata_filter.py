@@ -1,4 +1,4 @@
-from rag.vector_store import VectorStore
+from backend.rag.vector_store import VectorStore
 
 
 class MetadataFilter:
@@ -12,7 +12,10 @@ class MetadataFilter:
     def get_by_document_type(self, document_type):
         results = self.vector_store.collection.get(
             where={
-                "document_type": document_type
+                "$and": [
+                    {"approved": True},
+                    {"document_type": document_type},
+                ]
             }
         )
 

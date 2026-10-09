@@ -3,13 +3,13 @@ import chromadb
 COLLECTION_NAME = "torilo_knowledge_base"
 
 class VectorStore:
-    def __init__(self, persist_directory="chroma_db"):
+    def __init__(self, persist_directory="chroma_db", collection_name=COLLECTION_NAME):
         self.client = chromadb.PersistentClient(
             path=persist_directory
         )
 
         self.collection = self.client.get_or_create_collection(
-            name=COLLECTION_NAME,
+            name=collection_name,
             metadata={
                 "description": "Torilo Academy knowledge base",
             }
@@ -52,13 +52,16 @@ class VectorStore:
                     chunk.metadata.last_verified or ""
                 ),
                 "status": chunk.metadata.status,
+                "approved": chunk.metadata.approved,
+                "title": chunk.metadata.title or chunk.metadata.document_type,
+                "category": chunk.metadata.category or "",
                 "chunk_index": chunk.chunk_index,
             })
 
         self.collection.upsert(
             ids=ids,
             documents=documents,
-            embeddings=embeddings.tolist(),
+            embeddings=[list(embedding) for embedding in embeddings],
             metadatas=metadatas,
         )
 
@@ -66,3 +69,11 @@ class VectorStore:
 
     def count(self):
         return self.collection.count()
+
+    def has_ingestion_fingerprint(self, fingerprint):
+        return self.collection.metadata.get("ingestion_fingerprint") == fingerprint
+
+    def set_ingestion_fingerprint(self, fingerprint):
+        metadata = dict(self.collection.metadata or {})
+        metadata["ingestion_fingerprint"] = fingerprint
+        self.collection.modify(metadata=metadata)
