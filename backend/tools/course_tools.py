@@ -19,6 +19,11 @@ def _course_record(course: Course, instructor_name: str | None = None) -> dict[s
 		"level": course.level,
 		"duration_weeks": course.duration_weeks,
 		"instructor_name": instructor_name,
+		"data_status": (
+			"synthetic_demo"
+			if course.description.startswith("DEMO DB RECORD")
+			else "verified_live"
+		),
 	}
 
 

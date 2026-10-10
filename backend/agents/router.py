@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
+from backend.agents.classifier import deterministic_classification, route_classification
 from backend.agents.state import ChatMessage, Route
 
 _GREETING = re.compile(
@@ -32,7 +33,7 @@ _ACADEMY_MARKERS = re.compile(
 	re.IGNORECASE,
 )
 _FOLLOW_UP = re.compile(
-	r"^(what about|what if|and if|why|how about|does that|is that|can i|what then|"
+	r"^(what about|what if|and if|how about|does that|is that|what then|"
 	r"in that case|they|it|that)\b",
 	re.IGNORECASE,
 )
@@ -94,32 +95,14 @@ def _previous_academy_route(history: Sequence[ChatMessage]) -> Route | None:
 
 
 def route_message(message: str, history: Sequence[ChatMessage] = ()) -> tuple[Route, str | None]:
-	"""Classify a turn without making any academy-fact claims."""
-	clean_message = " ".join(message.split())
-	if _GREETING.fullmatch(clean_message):
-		return "GENERAL", None
-
-	database_tool = choose_database_tool(clean_message)
-	if database_tool is not None:
-		return "DATABASE", database_tool
-
-	if _RAG_TERMS.search(clean_message):
-		return "RAG", None
-
-	if _FOLLOW_UP.search(clean_message):
-		previous_route = _previous_academy_route(history)
-		if previous_route is not None:
-			tool_name = _previous_database_tool(history) if previous_route == "DATABASE" else None
-			return previous_route, tool_name
-
-	if _ACADEMY_MARKERS.search(clean_message):
-		return "UNKNOWN", None
-
-	# Do not treat arbitrary requests as harmless small talk: generic general
-	# responses are limited to greetings and simple social exchanges.
-	if len(clean_message.split()) <= 3 and not clean_message.endswith("?"):
-		return "GENERAL", None
-	return "UNKNOWN", None
+	"""Compatibility helper using the same validated-intent policy as the graph."""
+	classification = deterministic_classification(message, history)
+	available_tools = {
+		"get_active_classes",
+		"search_classes",
+		"get_course_instructor",
+	}
+	return route_classification(classification, available_tools)
 
 
 def build_contextual_rag_query(
@@ -134,9 +117,18 @@ def build_contextual_rag_query(
 		if item.get("role") != "user":
 			continue
 		previous = " ".join(item.get("content", "").split())
-		if _RAG_TERMS.search(previous):
+		previous_intent = deterministic_classification(previous).intent
+		if previous_intent in {
+			"academy_overview",
+			"course_catalog",
+			"course_information",
+			"policy",
+			"campus_location",
+			"student_support",
+			"course_instructor",
+		}:
 			return f"{previous[:400]} {current}"[:500]
-		if choose_database_tool(previous):
+		if previous_intent in {"class_schedule", "course_instructor", "student_specific"}:
 			break
 	return current
 

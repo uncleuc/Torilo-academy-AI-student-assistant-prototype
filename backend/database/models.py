@@ -39,7 +39,10 @@ class Instructor(Base):
 class Course(Base):
 	__tablename__ = "courses"
 	__table_args__ = (
-		CheckConstraint("duration_weeks > 0", name="ck_courses_duration_positive"),
+		CheckConstraint(
+			"duration_weeks IS NULL OR duration_weeks > 0",
+			name="ck_courses_duration_positive",
+		),
 		Index("ix_courses_is_active_name", "is_active", "name"),
 	)
 
@@ -47,7 +50,7 @@ class Course(Base):
 	name: Mapped[str] = mapped_column(String(180), nullable=False)
 	description: Mapped[str] = mapped_column(String(4000), nullable=False, default="")
 	level: Mapped[str] = mapped_column(String(40), nullable=False, default="unspecified")
-	duration_weeks: Mapped[int] = mapped_column(Integer, nullable=False)
+	duration_weeks: Mapped[int | None] = mapped_column(Integer, nullable=True)
 	is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 	instructor_id: Mapped[int | None] = mapped_column(
 		ForeignKey("instructors.id", ondelete="RESTRICT"), nullable=True, index=True

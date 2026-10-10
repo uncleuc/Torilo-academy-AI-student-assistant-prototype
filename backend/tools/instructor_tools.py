@@ -38,6 +38,11 @@ def make_get_course_instructor(
 				"course_id": str(row.id),
 				"course_name": row.name,
 				"instructor_name": row.full_name,
+				"data_status": (
+					"synthetic_demo"
+					if row.full_name.startswith("Demo ")
+					else "verified_live"
+				),
 			}
 
 	return get_course_instructor

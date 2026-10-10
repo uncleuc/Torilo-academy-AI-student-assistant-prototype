@@ -13,6 +13,8 @@ try {
 	if ($LASTEXITCODE -ne 0) { throw "Frontend dependency installation failed." }
 	npm --prefix frontend run build
 	if ($LASTEXITCODE -ne 0) { throw "Frontend production build failed." }
+	& $python -m backend.database.seed
+	if ($LASTEXITCODE -ne 0) { throw "Local database setup/seed failed." }
 	Write-Host "Setup complete. Run scripts/start.ps1 to launch the application."
 }
 finally {

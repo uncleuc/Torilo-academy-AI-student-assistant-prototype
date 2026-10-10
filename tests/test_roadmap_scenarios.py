@@ -14,7 +14,6 @@ from backend.agents.router import (
 	route_message,
 )
 from backend.agents.safety import SAFETY_RESPONSE, inspect_user_message
-from backend.ai.grounding import UNKNOWN_RESPONSE
 
 ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA = ROOT / "tests"
@@ -98,8 +97,50 @@ def test_rag_catalog_cases_route_to_approved_source(case, approved_registry):
 
 	assert result["answer"] == "Answer based on supplied approved test evidence."
 	assert any(item["document"] == source for item in result["sources"])
-	assert retriever.calls == [case["question"]]
+	assert retriever.calls[0] == case["question"]
+	assert len(retriever.calls) <= 3
 	assert len(model.calls) == 1
+
+
+@pytest.mark.parametrize(
+	("question", "source", "supported_text"),
+	[
+		("what is torilo Academy", "academy/academy_overview.md", "technology training academy"),
+		("what courses does torilo academy offer", "courses/courses_catalog.md", "AI Engineering"),
+		("how long is the AI engineering mastery program", "courses/ai_engineering.md", "16-week training programme"),
+		("What topics are covered in the AI engineering program", "courses/ai_engineering.md", "machine learning, deep learning"),
+		("where are torilo academy campuses located", "academy/campuses_and_contact.md", "Olaniyan Close"),
+		("if i cant attend class what should i do?", "policies/attendance_and_participation.md", "expected to attend"),
+		("can i study at torilo remotely or do i have to attend physically", "courses/ai_engineering.md", "Live online learning"),
+	],
+)
+def test_public_information_uses_approved_evidence_not_synthetic_course_data(
+	question: str,
+	source: str,
+	supported_text: str,
+):
+	model = RecordingModel()
+	retriever = RecordingRetriever(source)
+	database_calls: list[str] = []
+	graph = build_assistant_graph(
+		retriever=retriever,
+		database_tools={
+			"get_available_courses": lambda: database_calls.append("called")
+		},
+		llm=model,
+	)
+	result = graph.invoke(
+		{"message": question, "conversation_id": "public-info", "chat_history": []}
+	)
+
+	assert result["route"] == "RAG"
+	assert any(item["document"] == source for item in result["sources"])
+	assert retriever.calls[0] == question
+	assert supported_text in "\n".join(str(message.content) for message in model.calls[0])
+	assert "Synthetic Python Course" not in "\n".join(
+		str(message.content) for message in model.calls[0]
+	)
+	assert database_calls == []
 
 
 @pytest.mark.parametrize("case", load_cases("database_questions.json"), ids=lambda case: case["id"])
@@ -202,7 +243,7 @@ def test_unknown_catalog_cases_return_fixed_no_evidence_result(case):
 	)
 
 	assert route_message(case["question"]) == (case["expected_route"], None)
-	assert result["answer"] == UNKNOWN_RESPONSE
+	assert "student-support@torilo.ng" in result["answer"]
 	assert result["sources"] == case["expected_sources"]
 	assert len(model.calls) == case["expected_llm_calls"]
 	assert retriever.calls == []

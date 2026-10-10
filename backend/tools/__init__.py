@@ -7,7 +7,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from backend.tools.class_tools import make_get_active_classes
+from backend.tools.class_tools import make_get_active_classes, make_search_classes
 from backend.tools.course_tools import (
 	make_get_available_courses,
 	make_get_course_details,
@@ -25,5 +25,6 @@ def build_database_tools(
 		"get_course_details": make_get_course_details(session_factory),
 		"get_course_instructor": make_get_course_instructor(session_factory),
 		"get_active_classes": make_get_active_classes(session_factory),
+		"search_classes": make_search_classes(session_factory),
 		"search_courses": make_search_courses(session_factory),
 	}

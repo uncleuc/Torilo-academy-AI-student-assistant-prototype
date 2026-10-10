@@ -10,4 +10,11 @@
 	{"id":"certification","question":"What are the certification requirements?","expected_route":"RAG","expected_source":"policies/certification_policy.md"},
 	{"id":"student-support","question":"How can I contact student support?","expected_route":"RAG","expected_source":"academy/student_support.md"},
 	{"id":"enrollment-requirements","question":"What are the enrollment requirements?","expected_route":"RAG","expected_source":"admissions/enrollment_requirements.md"}
+	,{"id":"academy-overview-paraphrase","question":"what is torilo Academy","expected_route":"RAG","expected_source":"academy/academy_overview.md"}
+	,{"id":"public-course-catalog-paraphrase","question":"what courses does torilo academy offer","expected_route":"RAG","expected_source":"courses/courses_catalog.md"}
+	,{"id":"ai-engineering-duration-paraphrase","question":"how long is the AI engineering mastery program","expected_route":"RAG","expected_source":"courses/ai_engineering.md"}
+	,{"id":"ai-engineering-topics-paraphrase","question":"What topics are covered in the AI engineering program","expected_route":"RAG","expected_source":"courses/ai_engineering.md"}
+	,{"id":"campus-location-paraphrase","question":"where are torilo academy campuses located","expected_route":"RAG","expected_source":"academy/campuses_and_contact.md"}
+	,{"id":"attendance-unable-to-attend","question":"if i cant attend class what should i do?","expected_route":"RAG","expected_source":"policies/attendance_and_participation.md"}
+	,{"id":"ai-engineering-remote-format","question":"can i study at torilo remotely or do i have to attend physically","expected_route":"RAG","expected_source":"courses/ai_engineering.md"}
 ]

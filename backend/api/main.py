@@ -59,6 +59,8 @@ def create_app(
 	session_factory: sessionmaker[Session] | None = None,
 	assistant_initializer: AssistantInitializer | None = None,
 	allowed_origins: list[str] | None = None,
+	database_data_verified: bool | None = None,
+	database_demo_mode: bool | None = None,
 ) -> FastAPI:
 	"""Create an API with lazy production setup and injectable test services."""
 	settings = get_settings()
@@ -66,6 +68,17 @@ def create_app(
 	provided_session_factory = session_factory
 	provided_tools = database_tools
 	provided_runner = assistant_runner
+	verified_database = (
+		settings.database_data_verified
+		if database_data_verified is None
+		else database_data_verified
+	)
+	demo_database_setting = (
+		settings.database_demo_mode
+		if database_demo_mode is None
+		else database_demo_mode
+	)
+	demo_database = demo_database_setting and settings.environment == "development"
 
 	@asynccontextmanager
 	async def lifespan(app: FastAPI):
@@ -75,11 +88,12 @@ def create_app(
 			engine = create_database_engine()
 			active_session_factory = create_session_factory(engine)
 		try:
-			active_tools = (
+			configured_tools = (
 				provided_tools
 				if provided_tools is not None
 				else build_database_tools(active_session_factory)
 			)
+			active_tools = configured_tools if verified_database or demo_database else {}
 			active_runner = provided_runner
 			initializer = assistant_initializer
 			if active_runner is None:

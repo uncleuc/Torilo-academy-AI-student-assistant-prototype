@@ -23,6 +23,8 @@ Required Railway variables:
 
 ```env
 DATABASE_URL=${{Postgres.DATABASE_URL}}
+DATABASE_DATA_VERIFIED=false
+DATABASE_DEMO_MODE=false
 OPENAI_API_KEY=<set as a secret in Railway>
 LLM_MODEL=<approved chat model>
 EMBEDDING_MODEL=text-embedding-3-small
@@ -35,6 +37,10 @@ FRONTEND_URL=https://<your-railway-domain>,https://ai.softshell-diminished.ts.ne
 ```
 
 `PORT` is supplied by Railway and consumed by `scripts/start.sh`. Do not set it to a fixed port in production. The FastAPI CORS allowlist is only needed for direct cross-origin API use; same-origin `/api` requests through the built frontend do not require browser CORS.
+
+Keep `DATABASE_DATA_VERIFIED=false` until the database contains current, authorized Academy course/class records and those records have been reviewed. This setting defaults to false and disables database-backed assistant tools and public course endpoints; it does not automatically validate data quality. Never enable it for the synthetic fixtures.
+
+`DATABASE_DEMO_MODE` is for local development only and is ignored outside `ENVIRONMENT=development`. Keep it false in Railway. Demo seed instructors and schedules are invented fixture data and carry `data_status=synthetic_demo`; do not present them as real Academy records.
 
 ### Custom domain and Tailscale
 

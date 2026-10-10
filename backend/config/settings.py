@@ -23,6 +23,8 @@ class Settings:
 	backend_port: int = 8000
 	frontend_origins: tuple[str, ...] = ("http://localhost:5173",)
 	database_url: str | None = field(default=None, repr=False)
+	database_data_verified: bool = False
+	database_demo_mode: bool = False
 	llm_model: str | None = None
 	openai_api_key: str | None = field(default=None, repr=False)
 	embedding_model: str | None = None
@@ -47,6 +49,12 @@ class Settings:
 			raise ValueError("BACKEND_PORT must be an integer") from exc
 		if not 1 <= port <= 65535:
 			raise ValueError("BACKEND_PORT must be between 1 and 65535")
+		database_data_verified_text = values.get("DATABASE_DATA_VERIFIED", "false").strip().lower()
+		if database_data_verified_text not in {"true", "false"}:
+			raise ValueError("DATABASE_DATA_VERIFIED must be true or false")
+		database_demo_mode_text = values.get("DATABASE_DEMO_MODE", "false").strip().lower()
+		if database_demo_mode_text not in {"true", "false"}:
+			raise ValueError("DATABASE_DEMO_MODE must be true or false")
 
 		log_level = values.get("LOG_LEVEL", "INFO").strip().upper()
 		if log_level not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
@@ -71,6 +79,8 @@ class Settings:
 			backend_port=port,
 			frontend_origins=origins,
 			database_url=values.get("DATABASE_URL") or None,
+			database_data_verified=database_data_verified_text == "true",
+			database_demo_mode=database_demo_mode_text == "true",
 			llm_model=values.get("LLM_MODEL") or None,
 			openai_api_key=values.get("OPENAI_API_KEY") or None,
 			embedding_model=values.get("EMBEDDING_MODEL") or None,

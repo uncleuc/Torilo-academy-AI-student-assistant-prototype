@@ -1,20 +1,18 @@
 [
-	{
-		"id": 1,
-		"name": "Synthetic Python Course",
-		"description": "Synthetic development record for database-tool testing.",
-		"level": "beginner",
-		"duration_weeks": 8,
-		"is_active": true,
-		"instructor_id": 1
-	},
-	{
-		"id": 2,
-		"name": "Synthetic Data Course",
-		"description": "Synthetic development record for database-tool testing.",
-		"level": "intermediate",
-		"duration_weeks": 10,
-		"is_active": true,
-		"instructor_id": 2
-	}
+	{"id": 1, "name": "Synthetic Python Course", "description": "Legacy synthetic development record retained for existing enrollment references.", "level": "beginner", "duration_weeks": 8, "is_active": false, "instructor_id": 1},
+	{"id": 2, "name": "Synthetic Data Course", "description": "Legacy synthetic development record retained for existing references.", "level": "intermediate", "duration_weeks": 10, "is_active": false, "instructor_id": 2},
+	{"id": 3, "name": "AI Engineering", "description": "DEMO DB RECORD. Public course summary from the approved KB; this is not evidence of a current cohort or availability.", "level": "unspecified", "duration_weeks": 16, "is_active": true, "instructor_id": 1},
+	{"id": 4, "name": "Generative AI", "description": "DEMO DB RECORD. The KB lists both 8-week and 16-week options; confirm the current format with Admissions.", "level": "unspecified", "duration_weeks": null, "is_active": true, "instructor_id": 2},
+	{"id": 5, "name": "Data Analysis", "description": "DEMO DB RECORD. Practical data collection, cleaning, analysis, visualization, and interpretation.", "level": "unspecified", "duration_weeks": 12, "is_active": true, "instructor_id": 3},
+	{"id": 6, "name": "Cybersecurity & Ethical Hacking", "description": "DEMO DB RECORD. Cybersecurity, ethical hacking, penetration testing, threat analysis, and security operations.", "level": "unspecified", "duration_weeks": 16, "is_active": true, "instructor_id": 4},
+	{"id": 7, "name": "Software Development", "description": "DEMO DB RECORD. Full-stack software development covering frontend, backend, databases, and software practices.", "level": "unspecified", "duration_weeks": 16, "is_active": true, "instructor_id": 5},
+	{"id": 8, "name": "Frontend Web Development", "description": "DEMO DB RECORD. Building and optimizing responsive web interfaces.", "level": "unspecified", "duration_weeks": 8, "is_active": true, "instructor_id": 1},
+	{"id": 9, "name": "Backend Development", "description": "DEMO DB RECORD. Server-side development with Python, Django, SQL, and backend fundamentals.", "level": "unspecified", "duration_weeks": 8, "is_active": true, "instructor_id": 2},
+	{"id": 10, "name": "Cloud Computing", "description": "DEMO DB RECORD. Cloud infrastructure, security, networking, databases, architecture, migration, and deployment.", "level": "unspecified", "duration_weeks": 12, "is_active": true, "instructor_id": 3},
+	{"id": 11, "name": "Product Design (UI/UX)", "description": "DEMO DB RECORD. User research, UX, interface design, prototyping, and design systems.", "level": "unspecified", "duration_weeks": 8, "is_active": true, "instructor_id": 4},
+	{"id": 12, "name": "Product Management", "description": "DEMO DB RECORD. Product lifecycle, user needs, strategy, experimentation, metrics, and delivery.", "level": "unspecified", "duration_weeks": 8, "is_active": true, "instructor_id": 5},
+	{"id": 13, "name": "Product Development", "description": "DEMO DB RECORD. The KB lists this course area but does not specify a duration or detailed curriculum.", "level": "unspecified", "duration_weeks": null, "is_active": true, "instructor_id": 1},
+	{"id": 14, "name": "Digital Marketing", "description": "DEMO DB RECORD. The KB lists 5-week Associate and 8-week Mastery/NEST options; confirm the current option.", "level": "unspecified", "duration_weeks": null, "is_active": true, "instructor_id": 2},
+	{"id": 15, "name": "Visual & Graphic Design", "description": "DEMO DB RECORD. Visual design for graphics, brand identities, digital media, and professional design assets.", "level": "unspecified", "duration_weeks": 8, "is_active": true, "instructor_id": 3},
+	{"id": 16, "name": "Project Management", "description": "DEMO DB RECORD. Project planning, execution, monitoring, risk, and delivery.", "level": "unspecified", "duration_weeks": 8, "is_active": true, "instructor_id": 4}
 ]

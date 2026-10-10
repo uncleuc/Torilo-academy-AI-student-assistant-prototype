@@ -22,13 +22,19 @@ The graph is constructed with three injected dependencies: a Group 1 retriever, 
 | `RAG` | Fresh approved context retrieved from `retrieve_documents(query)`; model runs only if usable evidence exists. |
 | `DATABASE` | One fixed allowlisted tool is called; ID-based course tools require one unique `course_id` search match. |
 | `GENERAL` | Model handles a simple greeting/social turn without academy claims. |
+| `CLARIFY` | Ask a short question when the request or referent is genuinely ambiguous; no data tool is called. |
+| `UNAVAILABLE` | Explain that current/private data cannot be verified and provide Student Support contact details. |
 | `UNKNOWN` | Fixed insufficient-information response; no retrieval, database, or model call. |
 
-Routing is deterministic keyword/phrase logic in `backend/agents/router.py`, not an LLM classifier. Unsupported or ambiguous questions should remain unknown rather than being routed to a likely-sounding source.
+After the safety check, a structured-output classifier produces a validated intent, entities, time-sensitivity, confidence, and clarification decision. It never selects a tool. A fixed policy maps public stable facts to RAG, current schedules to the schedule tool, and private student data to unavailable. If structured output fails, a conservative local classifier is used. Ambiguous requests clarify; unsupported Academy facts receive a safe support handoff.
+
+RAG query expansion runs only after the fixed policy selects RAG. It retains the original query first and adds at most two deterministic spelling/phrase variants. The original student message is still used to generate the answer. General course catalog questions use the approved KB, not database fixtures.
+
+Database tools and public course endpoints are unavailable unless `DATABASE_DATA_VERIFIED=true`. This flag defaults to false and is an explicit operator assertion that records are maintained, current, authorized Academy data; it is not an automated verification mechanism.
 
 ## State and Evidence
 
-`AssistantState` contains the current message, conversation ID, bounded role/content history, route, retrieval/tool results, answer and sources. It must not contain secrets, ORM sessions, service clients or raw exception objects. Retrieved text, database values and history are untrusted data, not instructions.
+`AssistantState` contains the current message, conversation ID, bounded role/content history, validated classification, route, retrieval/tool results, answer and sources. It must not contain secrets, ORM sessions, service clients or raw exception objects. Retrieved text, database values and history are untrusted data, not instructions.
 
 The response node applies an evidence-presence gate. RAG context must be non-empty and approved; database results must be non-empty. This is not a semantic entailment proof, so prompts, citations, scenario tests and review remain important.
 

@@ -4,7 +4,15 @@ from __future__ import annotations
 
 from typing import Any, Literal, TypedDict
 
-Route = Literal["SAFETY", "RAG", "DATABASE", "GENERAL", "UNKNOWN"]
+Route = Literal[
+	"SAFETY",
+	"RAG",
+	"DATABASE",
+	"GENERAL",
+	"CLARIFY",
+	"UNAVAILABLE",
+	"UNKNOWN",
+]
 MessageRole = Literal["user", "assistant"]
 
 
@@ -26,6 +34,7 @@ class AssistantState(TypedDict, total=False):
 	message: str
 	conversation_id: str
 	chat_history: list[ChatMessage]
+	classification: dict[str, Any]
 	route: Route
 	retrieval_query: str
 	database_query: str
@@ -39,6 +48,7 @@ class AssistantState(TypedDict, total=False):
 	retrieval_error: bool
 	database_error: bool
 	response_error: bool
+	clarification_question: str
 
 
 REQUIRED_INITIAL_STATE_KEYS = frozenset({"message", "conversation_id", "chat_history"})

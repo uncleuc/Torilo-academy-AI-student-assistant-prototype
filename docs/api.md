@@ -40,8 +40,8 @@ The route calls the injected `run_student_assistant(message, conversation_id)` e
 | Method/path | Purpose |
 | --- | --- |
 | `GET /api/health` | Readiness check; executes `SELECT 1` against PostgreSQL and returns `{"status":"healthy","database":"healthy"}`. |
-| `GET /api/courses` | Returns active public course records from `get_available_courses`. |
-| `GET /api/courses/{course_id}` | Returns an active course or 404. |
+| `GET /api/courses` | Returns active course records when verified DB access is enabled, or in development demo mode; otherwise 503. Each row includes `data_status`. |
+| `GET /api/courses/{course_id}` | Returns an active course or 404 when verified DB access or development demo mode is enabled; otherwise 503. |
 
 ## Status Codes
 
@@ -59,6 +59,7 @@ Validation, database, and unexpected error handlers return safe messages. Never 
 ## CORS and Same-Origin Routing
 
 FastAPI reads the comma-separated `FRONTEND_URL` setting as its CORS allowlist. CORS is not needed for the normal Vite flow because the browser calls a relative `/api` path and Vite proxies it to FastAPI. Do not use `allow_origins=["*"]` as a substitute for configuring deployment origins.
+`DATABASE_DATA_VERIFIED` defaults to false. `DATABASE_DEMO_MODE=true` exposes clearly marked seed records only when `ENVIRONMENT=development`; those responses contain `data_status=synthetic_demo` and must not be described as real Academy staff or current classes. Set `DATABASE_DATA_VERIFIED=true` only after loading and reviewing current authorized Academy records. It is an operator assertion, not automatic data-quality validation.
 
 ## Local API Check
 

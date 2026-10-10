@@ -30,4 +30,9 @@ echo "Installing frontend dependencies and building the production UI..."
 npm --prefix frontend ci
 npm --prefix frontend run build
 
+if [[ -z "${RAILWAY_ENVIRONMENT:-}" && -z "${RAILWAY_SERVICE_ID:-}" ]]; then
+	echo "Checking whether local demo database setup is enabled..."
+	"$PYTHON_BIN" -m backend.database.seed
+fi
+
 echo "Setup complete. Run scripts/start.sh to launch the application."

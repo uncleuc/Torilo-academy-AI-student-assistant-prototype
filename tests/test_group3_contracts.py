@@ -9,8 +9,9 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from backend.api.main import create_app
+from backend.config import Settings
 from backend.database.models import Base, Class, Course, Enrollment, Instructor, Student
-from backend.database.seed import seed_database
+from backend.database.seed import seed_database, seed_demo_database_once
 from backend.tools import build_database_tools
 
 
@@ -34,24 +35,68 @@ def test_seed_is_idempotent_and_tools_return_public_records(session_factory):
 	seed_database(session_factory)
 
 	with session_factory() as session:
-		assert session.scalar(select(func.count()).select_from(Instructor)) == 2
-		assert session.scalar(select(func.count()).select_from(Student)) == 1
-		assert session.scalar(select(func.count()).select_from(Course)) == 2
-		assert session.scalar(select(func.count()).select_from(Class)) == 1
-		assert session.scalar(select(func.count()).select_from(Enrollment)) == 1
+		assert session.scalar(select(func.count()).select_from(Instructor)) == 5
+		assert session.scalar(select(func.count()).select_from(Student)) == 0
+		assert session.scalar(select(func.count()).select_from(Course)) == 16
+		assert session.scalar(select(func.count()).select_from(Class)) == 5
+		assert session.scalar(select(func.count()).select_from(Enrollment)) == 0
 
 	tools = build_database_tools(session_factory)
 	courses = tools["get_available_courses"]()
-	assert [record["course_name"] for record in courses] == [
-		"Synthetic Data Course",
-		"Synthetic Python Course",
-	]
-	assert tools["get_course_details"]("1")["course_name"] == "Synthetic Python Course"
-	assert tools["get_course_instructor"]("1")["instructor_name"] == "Sample Instructor One"
-	assert tools["search_courses"]("Python")[0]["course_id"] == "1"
+	assert len(courses) == 14
+	assert courses[0]["course_name"] == "AI Engineering"
+	assert tools["get_course_details"]("3")["course_name"] == "AI Engineering"
+	assert tools["get_course_instructor"]("3")["instructor_name"] == "Demo Adaeze Nwosu"
+	assert tools["get_course_instructor"]("3")["data_status"] == "synthetic_demo"
+	assert tools["search_courses"]("Backend")[0]["course_id"] == "9"
 	assert tools["get_course_details"]("invalid") is None
 	assert tools["get_active_classes"]() == []
+	assert tools["search_classes"]("AI Engineering")[0]["data_status"] == "synthetic_demo"
 	assert all("email" not in record for record in courses)
+
+
+def test_setup_demo_seed_runs_once_and_refuses_unrecognized_course(session_factory):
+	settings = Settings.from_env(
+		{
+			"ENVIRONMENT": "development",
+			"DATABASE_DATA_VERIFIED": "false",
+			"DATABASE_DEMO_MODE": "true",
+		}
+	)
+	engine = session_factory.kw["bind"]
+
+	assert seed_demo_database_once(session_factory, settings=settings, engine=engine) is True
+	assert seed_demo_database_once(session_factory, settings=settings, engine=engine) is False
+	with session_factory() as session:
+		assert session.scalar(select(func.count()).select_from(Course)) == 16
+
+	conflict_engine = create_engine(
+		"sqlite+pysqlite:///:memory:",
+		connect_args={"check_same_thread": False},
+		poolclass=StaticPool,
+	)
+	Base.metadata.create_all(conflict_engine)
+	conflict_factory = sessionmaker(bind=conflict_engine, class_=Session)
+	try:
+		with conflict_factory.begin() as session:
+			session.add(
+				Course(
+					id=1,
+					name="Actual Academy Course",
+					description="Existing data",
+					level="unspecified",
+					duration_weeks=8,
+					is_active=True,
+				)
+			)
+		with pytest.raises(RuntimeError, match="will not overwrite"):
+			seed_demo_database_once(
+				conflict_factory,
+				settings=settings,
+				engine=conflict_engine,
+			)
+	finally:
+		conflict_engine.dispose()
 
 
 def test_chat_delegates_to_injected_runner_and_returns_its_response(session_factory):
@@ -105,19 +150,54 @@ def test_health_and_course_endpoints_use_injected_services(session_factory):
 		assistant_runner=lambda *_: {},
 		database_tools=build_database_tools(session_factory),
 		session_factory=session_factory,
+		database_data_verified=True,
 	)
 	with TestClient(app) as client:
 		health = client.get("/api/health")
 		courses = client.get("/api/courses")
-		course = client.get("/api/courses/1")
+		course = client.get("/api/courses/3")
 		missing = client.get("/api/courses/999")
 
 	assert health.status_code == 200
 	assert health.json() == {"status": "healthy", "database": "healthy"}
 	assert courses.status_code == 200
-	assert len(courses.json()) == 2
-	assert courses.json()[0]["course_id"] == "2"
-	assert courses.json()[0]["course_name"] == "Synthetic Data Course"
+	assert len(courses.json()) == 14
+	assert courses.json()[0]["course_id"] == "3"
+	assert courses.json()[0]["course_name"] == "AI Engineering"
 	assert course.status_code == 200
-	assert course.json()["course_name"] == "Synthetic Python Course"
+	assert course.json()["course_name"] == "AI Engineering"
 	assert missing.status_code == 404
+
+
+def test_unverified_database_is_not_exposed_through_public_course_api(session_factory):
+	seed_database(session_factory)
+	app = create_app(
+		assistant_runner=lambda *_: {},
+		database_tools=build_database_tools(session_factory),
+		session_factory=session_factory,
+		database_data_verified=False,
+		database_demo_mode=False,
+	)
+	with TestClient(app) as client:
+		courses = client.get("/api/courses")
+		course = client.get("/api/courses/1")
+
+	assert courses.status_code == 503
+	assert course.status_code == 503
+
+
+def test_development_demo_mode_exposes_only_marked_seed_records(session_factory):
+	seed_database(session_factory)
+	app = create_app(
+		assistant_runner=lambda *_: {},
+		database_tools=build_database_tools(session_factory),
+		session_factory=session_factory,
+		database_data_verified=False,
+		database_demo_mode=True,
+	)
+	with TestClient(app) as client:
+		response = client.get("/api/courses")
+
+	assert response.status_code == 200
+	assert len(response.json()) == 14
+	assert all(record["data_status"] == "synthetic_demo" for record in response.json())

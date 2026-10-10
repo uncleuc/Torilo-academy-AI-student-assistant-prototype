@@ -15,6 +15,8 @@ def test_settings_parse_origins_paths_and_hide_secrets(tmp_path: Path):
 			"BACKEND_PORT": "8012",
 			"FRONTEND_URL": "http://localhost:5173/, http://localhost:4173",
 			"DATABASE_URL": "postgresql://user:secret@localhost/test_db",
+			"DATABASE_DATA_VERIFIED": "true",
+			"DATABASE_DEMO_MODE": "true",
 			"OPENAI_API_KEY": "test-api-key",
 			"LLM_MODEL": "test-chat-model",
 			"EMBEDDING_MODEL": "text-embedding-3-small",
@@ -32,18 +34,32 @@ def test_settings_parse_origins_paths_and_hide_secrets(tmp_path: Path):
 	assert settings.chroma_persist_directory == (tmp_path / "test-data/chroma").resolve()
 	assert settings.chroma_collection_name == "test-collection"
 	assert settings.embedding_model == "text-embedding-3-small"
+	assert settings.database_data_verified is True
+	assert settings.database_demo_mode is True
 	assert "secret" not in repr(settings)
 	assert "test-api-key" not in repr(settings)
 
 
 def test_default_frontend_origins_include_configured_public_hosts():
 	settings = Settings.from_env({})
+	assert settings.database_data_verified is False
+	assert settings.database_demo_mode is False
 	assert settings.frontend_origins == (
 		"http://localhost:5173",
 		"https://ai.softshell-diminished.ts.net",
 		"https://torilo.net",
 		"https://www.torilo.net",
 	)
+
+
+def test_settings_reject_invalid_database_verification_flag():
+	with pytest.raises(ValueError, match="DATABASE_DATA_VERIFIED"):
+		Settings.from_env({"DATABASE_DATA_VERIFIED": "yes"})
+
+
+def test_settings_reject_invalid_database_demo_mode_flag():
+	with pytest.raises(ValueError, match="DATABASE_DEMO_MODE"):
+		Settings.from_env({"DATABASE_DEMO_MODE": "yes"})
 
 
 @pytest.mark.parametrize("port", ["0", "65536", "not-a-port"])

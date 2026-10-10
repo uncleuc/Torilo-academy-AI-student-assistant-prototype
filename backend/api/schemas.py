@@ -53,5 +53,6 @@ class CourseResponse(BaseModel):
 	course_name: str
 	description: str
 	level: str
-	duration_weeks: int
+	duration_weeks: int | None
 	instructor_name: str | None = None
+	data_status: str = "verified_live"

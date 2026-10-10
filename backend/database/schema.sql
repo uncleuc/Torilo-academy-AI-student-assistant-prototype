@@ -20,7 +20,7 @@ CREATE TABLE courses (
     name VARCHAR(180) NOT NULL,
     description VARCHAR(4000) NOT NULL DEFAULT '',
     level VARCHAR(40) NOT NULL DEFAULT 'unspecified',
-    duration_weeks INTEGER NOT NULL CHECK (duration_weeks > 0),
+    duration_weeks INTEGER CHECK (duration_weeks IS NULL OR duration_weeks > 0),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     instructor_id INTEGER REFERENCES instructors(id) ON DELETE RESTRICT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

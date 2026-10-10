@@ -1,4 +1,4 @@
 [
 	{"id":"attendance-follow-up","messages":["What is the attendance policy?","What if I have a valid reason?"],"expected_routes":["RAG","RAG"],"expected_retrieval_query":"What is the attendance policy? What if I have a valid reason?","expected_source":"policies/attendance_and_participation.md"},
-	{"id":"course-instructor-follow-up","messages":["Who teaches the Python course?","What about that course?"],"expected_routes":["DATABASE","DATABASE"],"expected_tools":["get_course_instructor","get_course_instructor"],"expected_search_query":"Python"}
+	{"id":"course-instructor-follow-up","messages":["Who teaches the Backend Development course?","What about that course?"],"expected_routes":["RAG","RAG"],"expected_retrieval_query":"Who teaches the Backend Development course? What about that course?","expected_source":"courses/backend_development.md"}
 ]

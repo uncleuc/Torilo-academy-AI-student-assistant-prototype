@@ -1,14 +1,7 @@
 [
-	{
-		"id": 1,
-		"full_name": "Sample Instructor One",
-		"email": "instructor-one@example.invalid",
-		"is_active": true
-	},
-	{
-		"id": 2,
-		"full_name": "Sample Instructor Two",
-		"email": "instructor-two@example.invalid",
-		"is_active": true
-	}
+	{"id": 1, "full_name": "Demo Adaeze Nwosu", "email": "adaeze.nwosu@example.invalid", "is_active": true},
+	{"id": 2, "full_name": "Demo Chinedu Okafor", "email": "chinedu.okafor@example.invalid", "is_active": true},
+	{"id": 3, "full_name": "Demo Zainab Bello", "email": "zainab.bello@example.invalid", "is_active": true},
+	{"id": 4, "full_name": "Demo Tunde Adebayo", "email": "tunde.adebayo@example.invalid", "is_active": true},
+	{"id": 5, "full_name": "Demo Ifeoma Eze", "email": "ifeoma.eze@example.invalid", "is_active": true}
 ]
